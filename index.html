@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Illustrated Encyclopedia of ML & DL</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* --- Root Variables for Theming --- */
+        :root {
+            --bg-main: #121212;
+            --bg-nav: #1a1a1a;
+            --bg-content: #1e1e1e;
+            --bg-code: #2a2a2a;
+            --bg-card: #252525;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b3b3b3;
+            --text-header: #ffffff;
+            --accent-primary: #03dac6;
+            --accent-secondary: #bb86fc;
+            --accent-warning: #ff7043;
+            --accent-success: #66bb6a;
+            --border-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --font-mono: 'SF Mono', 'Fira Code', 'Consolas', 'Menlo', monospace;
+        }
+
+        /* --- General Resets & Body Styling --- */
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-nav); }
+        ::-webkit-scrollbar-thumb { background-color: #444; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #555; }
+
+        /* --- Main Layout --- */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--bg-nav);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+        }
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 3rem 4rem;
+        }
+        .content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* --- Sidebar & Navigation --- */
+        .sidebar-title {
+            color: var(--text-header);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 0.5rem;
+        }
+        #table-of-contents ul {
+            list-style: none;
+            padding: 0;
+        }
+        #table-of-contents li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 0;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+            transition: all 0.3s ease;
+        }
+        #table-of-contents li a:hover {
+            color: var(--accent-primary);
+            background-color: rgba(3, 218, 198, 0.05);
+        }
+        #table-of-contents li a.active {
+            color: var(--accent-primary);
+            font-weight: 600;
+            border-left-color: var(--accent-primary);
+            background-color: rgba(3, 218, 198, 0.1);
+        }
+
+        /* --- Typography --- */
+        h1, h2, h3, h4, h5 {
+            color: var(--text-header);
+            font-weight: 700;
+            line-height: 1.3;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        h1 { font-size: 3rem; text-align: center; border-bottom: none; margin-bottom: 1rem; }
+        .subtitle { font-size: 1.2rem; text-align: center; color: var(--text-secondary); margin-bottom: 3rem; }
+        h2 { font-size: 2.5rem; border-bottom: 2px solid var(--accent-primary); padding-bottom: 0.75rem; }
+        h3 { font-size: 2rem; }
+        h4 { font-size: 1.5rem; color: var(--accent-secondary); }
+        h5 { font-size: 1.2rem; color: var(--accent-warning); }
+        p { margin-bottom: 1rem; }
+        strong { color: var(--accent-primary); font-weight: 600; }
+        a { color: var(--accent-primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* --- Content Blocks --- */
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        section:last-of-type { border-bottom: none; }
+
+        /* --- Cards for Concepts --- */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h5 {
+            margin-top: 0;
+            color: var(--accent-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* --- Components: Code, Tables, Images, Blockquotes --- */
+        .code-block-wrapper {
+            position: relative;
+            margin: 1.5rem 0;
+        }
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .code-block-wrapper:hover .copy-btn { opacity: 1; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+        th { background-color: var(--bg-content); color: var(--text-header); font-weight: 600; }
+        tr:nth-child(even) { background-color: var(--bg-content); }
+
+        blockquote {
+            border-left: 5px solid var(--accent-secondary);
+            margin: 2rem 0;
+            padding: 1rem 1.5rem;
+            background-color: rgba(187, 134, 252, 0.08);
+            border-radius: 0 8px 8px 0;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+        blockquote footer {
+            margin-top: 0.5rem;
+            font-style: normal;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* --- Math Formulas --- */
+        .math-formula {
+            background-color: var(--bg-code);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        /* --- Animations & Transitions --- */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* --- Animated Diagrams --- */
+        .diagram-container {
+            background-color: var(--bg-content);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .diagram-container svg {
+            width: 100%;
+            max-width: 600px;
+            overflow: visible;
+        }
+        
+        /* NN Diagram Animations */
+        @keyframes pulse {
+            0%, 100% { r: 8; stroke-width: 2; }
+            50% { r: 10; stroke-width: 4; }
+        }
+        @keyframes flow {
+            from { stroke-dashoffset: 200; }
+            to { stroke-dashoffset: 0; }
+        }
+        .nn-node { transition: all 0.3s ease; }
+        .nn-node.active { animation: pulse 1s ease-in-out; }
+        .nn-link { stroke-dasharray: 200; stroke-dashoffset: 200; transition: stroke 0.5s ease; }
+        .nn-link.active { animation: flow 1.5s forwards; }
+
+        /* Convolution Diagram Animations */
+        #conv-kernel {
+            transition: all 1.5s ease-in-out;
+        }
+
+        /* --- Charts --- */
+        .chart-container {
+            background-color: var(--bg-content);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        /* --- Scroll to Top Button --- */
+        #scrollTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            border: none;
+            outline: none;
+            background-color: var(--accent-secondary);
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        #scrollTopBtn:hover {
+            background-color: #a052ff;
+            transform: scale(1.1);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 1200px) {
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar {
+                display: none; /* Hide sidebar on smaller screens */
+            }
+        }
+        @media (max-width: 768px) {
+            .main-content { padding: 2rem 1.5rem; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            h3 { font-size: 1.7rem; }
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <h2 class="sidebar-title">Table of Contents</h2>
+        <div id="table-of-contents"></div>
+    </nav>
+
+    <main class="main-content">
+        <div class="content-container">
+
+            <header>
+                <h1>The Encyclopedia of ML</h1>
+                <p class="subtitle">An in-depth guide to the core concepts of Machine Learning and Deep Learning.</p>
+            </header>
+            
+            <section id="introduction" class="fade-in-section">
+                <h2>1. Introduction to Artificial Intelligence</h2>
+                <p><strong>Artificial Intelligence (AI)</strong> is a broad field of computer science dedicated to creating systems that can perform tasks that normally require human intelligence. This includes problem-solving, understanding language, recognizing patterns, and learning. AI is the umbrella under which Machine Learning and Deep Learning reside.</p>
+                
+                <h4>Traditional AI vs. Machine Learning</h4>
+                <p>The earliest approaches to AI, often called <strong>Symbolic AI</strong> or "Good Old-Fashioned AI" (GOFAI), relied on programmers explicitly writing rules and logic for the machine to follow. An expert system, for example, is a classic GOFAI application that uses a knowledge base of rules to mimic the decision-making ability of a human expert.</p>
+                
+                <blockquote>
+                    <p><strong>Machine Learning (ML)</strong> represents a fundamental shift. Instead of being explicitly programmed, an ML system learns patterns directly from data.</p>
+                    <footer>— Arthur Samuel, 1959 (paraphrased)</footer>
+                </blockquote>
+                
+                <p>This ability to learn from experience makes ML powerful for complex problems where rules are difficult to define, such as image recognition or spam filtering.</p>
+                
+                <h4>History of AI and ML</h4>
+                <p>The history of AI has seen several cycles of optimism followed by disappointment and funding cuts (known as "AI winters"), but since the 2010s, advances in computing power, algorithms, and data availability have led to unprecedented progress.</p>
+                
+                <div class="chart-container">
+                    <canvas id="ai-history-chart"></canvas>
+                </div>
+            </section>
+            
+            <section id="ml-foundations" class="fade-in-section">
+                <h2>2. Machine Learning Foundations</h2>
+                
+                <h3 id="ml-types">2.1. Types of Machine Learning</h3>
+                <p>Machine learning models are typically categorized by their learning style:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Learning Type</th>
+                            <th>Data Requirement</th>
+                            <th>Goal</th>
+                            <th>Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Supervised Learning</strong></td>
+                            <td>Labeled Data</td>
+                            <td>Predict an output/label</td>
+                            <td>Classification, Regression</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unsupervised Learning</strong></td>
+                            <td>Unlabeled Data</td>
+                            <td>Find hidden structure in data</td>
+                            <td>Clustering, Dimensionality Reduction</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reinforcement Learning</strong></td>
+                            <td>No initial data; learns from interaction</td>
+                            <td>Learn a policy to maximize reward</td>
+                            <td>Game AI, Robotics, Self-Driving Cars</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Semi-supervised Learning</strong></td>
+                            <td>Mix of labeled and unlabeled data</td>
+                            <td>Leverage unlabeled data to improve learning</td>
+                            <td>Text classification with limited labels</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="ml-pipeline">2.2. The ML Pipeline</h3>
+                <p>An end-to-end machine learning project typically follows a structured pipeline:</p>
+                
+                <div class="diagram-container">
+                    <h4>Animated ML Pipeline</h4>
+                    <svg viewBox="0 0 800 100">
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent-primary)"></path>
+                            </marker>
+                        </defs>
+                        <!-- Steps -->
+                        <g class="pipeline-step" id="step1">
+                            <rect x="10" y="30" width="100" height="40" rx="5" fill="var(--bg-code)" stroke="var(--accent-primary)"/>
+                            <text x="60" y="55" fill="var(--text-primary)" text-anchor="middle" font-size="12">Data Collection</text>
+                        </g>
+                        <g class="pipeline-step" id="step2">
+                            <rect x="170" y="30" width="100" height="40" rx="5" fill="var(--bg-code)" stroke="var(--accent-primary)"/>
+                            <text x="220" y="55" fill="var(--text-primary)" text-anchor="middle" font-size="12">Preprocessing</text>
+                        </g>
+                        <g class="pipeline-step" id="step3">
+                            <rect x="330" y="30" width="100" height="40" rx="5" fill="var(--bg-code)" stroke="var(--accent-primary)"/>
+                            <text x="380" y="55" fill="var(--text-primary)" text-anchor="middle" font-size="12">Training</text>
+                        </g>
+                         <g class="pipeline-step" id="step4">
+                            <rect x="490" y="30" width="100" height="40" rx="5" fill="var(--bg-code)" stroke="var(--accent-primary)"/>
+                            <text x="540" y="55" fill="var(--text-primary)" text-anchor="middle" font-size="12">Evaluation</text>
+                        </g>
+                        <g class="pipeline-step" id="step5">
+                            <rect x="650" y="30" width="100" height="40" rx="5" fill="var(--bg-code)" stroke="var(--accent-primary)"/>
+                            <text x="700" y="55" fill="var(--text-primary)" text-anchor="middle" font-size="12">Deployment</text>
+                        </g>
+                        <!-- Arrows -->
+                        <line class="pipeline-arrow" x1="115" y1="50" x2="165" y2="50" stroke="var(--accent-primary)" stroke-width="2" marker-end="url(#arrow)"/>
+                        <line class="pipeline-arrow" x1="275" y1="50" x2="325" y2="50" stroke="var(--accent-primary)" stroke-width="2" marker-end="url(#arrow)"/>
+                        <line class="pipeline-arrow" x1="435" y1="50" x2="485" y2="50" stroke="var(--accent-primary)" stroke-width="2" marker-end="url(#arrow)"/>
+                        <line class="pipeline-arrow" x1="595" y1="50" x2="645" y2="50" stroke="var(--accent-primary)" stroke-width="2" marker-end="url(#arrow)"/>
+                    </svg>
+                    <style>
+                        .pipeline-step { opacity: 0; transform: translateY(20px); transition: all 0.5s ease-out; }
+                        .pipeline-arrow { stroke-dasharray: 50; stroke-dashoffset: 50; }
+                        .pipeline-step.visible { opacity: 1; transform: translateY(0); }
+                        .pipeline-arrow.visible { animation: draw-arrow 0.5s forwards; }
+                        @keyframes draw-arrow { to { stroke-dashoffset: 0; } }
+                    </style>
+                </div>
+                
+                <h3 id="ml-challenges">2.3. Key Challenges</h3>
+                <ul>
+                    <li><strong>Data Quality and Quantity:</strong> Garbage in, garbage out. Models are only as good as the data they are trained on.</li>
+                    <li><strong>Overfitting vs. Underfitting:</strong> The classic bias-variance tradeoff. Overfitting is when a model learns the training data too well, including its noise, and fails to generalize. Underfitting is when a model is too simple to capture the underlying structure.</li>
+                    <li><strong>Explainability:</strong> Many advanced models (like deep neural networks) act as "black boxes," making it hard to understand their decision-making process.</li>
+                    <li><strong>Computational Resources:</strong> Training complex models requires significant computational power and time.</li>
+                    <li><strong>Ethical Considerations:</strong> Issues like bias in training data leading to discriminatory outcomes, privacy concerns, and potential misuse of AI technologies.</li>
+                </ul>
+                
+                <h3 id="evaluation-metrics">2.4. Evaluation Metrics</h3>
+                <p>Different machine learning tasks require different evaluation metrics:</p>
+                
+                <div class="card-container">
+                    <div class="card">
+                        <h5>Classification Metrics</h5>
+                        <ul>
+                            <li>Accuracy</li>
+                            <li>Precision</li>
+                            <li>Recall</li>
+                            <li>F1-Score</li>
+                            <li>ROC-AUC</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Regression Metrics</h5>
+                        <ul>
+                            <li>Mean Absolute Error (MAE)</li>
+                            <li>Mean Squared Error (MSE)</li>
+                            <li>R-squared (R²)</li>
+                            <li>Root Mean Squared Error (RMSE)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Clustering Metrics</h5>
+                        <ul>
+                            <li>Silhouette Score</li>
+                            <li>Davies-Bouldin Index</li>
+                            <li>Calinski-Harabasz Index</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="deep-learning" class="fade-in-section">
+                <h2>3. Deep Learning & Neural Networks</h2>
+                <p><strong>Deep Learning</strong> is a powerful subset of machine learning that utilizes Artificial Neural Networks (ANNs) with multiple layers (hence "deep") to progressively extract higher-level features from data.</p>
+                
+                <h3 id="nn-basics">3.1. The Artificial Neuron</h3>
+                <p>Inspired by biological neurons, an artificial neuron is a computational unit that takes inputs, processes them, and produces an output. The core components are:</p>
+                <ul>
+                    <li><strong>Inputs (x):</strong> Values from the previous layer or raw data.</li>
+                    <li><strong>Weights (w):</strong> Parameters that determine the strength of each input signal.</li>
+                    <li><strong>Bias (b):</strong> An additional parameter to shift the activation function.</li>
+                    <li><strong>Activation Function (f):</strong> A function that introduces non-linearity and determines the final output of the neuron.</li>
+                </ul>
+                
+                <div class="math-formula">
+                    $$y = f\left(\sum_{i=1}^{n} w_i x_i + b\right)$$
+                </div>
+                
+                <h4>Common Activation Functions</h4>
+                <div class="card-container">
+                    <div class="card">
+                        <h5>Sigmoid</h5>
+                        <p>$$\sigma(x) = \frac{1}{1 + e^{-x}}$$</p>
+                        <p>Outputs between 0 and 1. Used for binary classification.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>ReLU (Rectified Linear Unit)</h5>
+                        <p>$$f(x) = \max(0, x)$$</p>
+                        <p>Most popular activation function. Computationally efficient.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Tanh</h5>
+                        <p>$$\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$$</p>
+                        <p>Outputs between -1 and 1. Zero-centered.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Softmax</h5>
+                        <p>$$\sigma(z_i) = \frac{e^{z_i}}{\sum_{j=1}^K e^{z_j}}$$</p>
+                        <p>Used for multi-class classification outputs.</p>
+                    </div>
+                </div>
+                
+                <h3 id="mlp">3.2. Animated Neural Network</h3>
+                <p>When these neurons are stacked in layers, they form a Multi-Layer Perceptron (MLP). The animation below shows data flowing through a simple network.</p>
+                
+                <div class="diagram-container">
+                     <h4>Data Flow Animation</h4>
+                    <svg id="nn-diagram" viewBox="0 0 400 200">
+                        <!-- Layers -->
+                        <g id="input-layer">
+                            <circle class="nn-node" id="i1" cx="50" cy="50" r="8" fill="var(--bg-code)" stroke="var(--accent-primary)" stroke-width="2"/>
+                            <circle class="nn-node" id="i2" cx="50" cy="100" r="8" fill="var(--bg-code)" stroke="var(--accent-primary)" stroke-width="2"/>
+                            <circle class="nn-node" id="i3" cx="50" cy="150" r="8" fill="var(--bg-code)" stroke="var(--accent-primary)" stroke-width="2"/>
+                        </g>
+                        <g id="hidden-layer">
+                            <circle class="nn-node" id="h1" cx="200" cy="30" r="8" fill="var(--bg-code)" stroke="var(--accent-secondary)" stroke-width="2"/>
+                            <circle class="nn-node" id="h2" cx="200" cy="80" r="8" fill="var(--bg-code)" stroke="var(--accent-secondary)" stroke-width="2"/>
+                            <circle class="nn-node" id="h3" cx="200" cy="130" r="8" fill="var(--bg-code)" stroke="var(--accent-secondary)" stroke-width="2"/>
+                             <circle class="nn-node" id="h4" cx="200" cy="180" r="8" fill="var(--bg-code)" stroke="var(--accent-secondary)" stroke-width="2"/>
+                        </g>
+                        <g id="output-layer">
+                            <circle class="nn-node" id="o1" cx="350" cy="75" r="8" fill="var(--bg-code)" stroke="#ff7043" stroke-width="2"/>
+                            <circle class="nn-node" id="o2" cx="350" cy="125" r="8" fill="var(--bg-code)" stroke="#ff7043" stroke-width="2"/>
+                        </g>
+                        <!-- Links -->
+                        <g id="links1"></g>
+                        <g id="links2"></g>
+                    </svg>
+                    <button id="animate-nn-btn">Animate Flow</button>
+                </div>
+                
+                <h3 id="training-nns">3.3. Training Neural Networks</h3>
+                <p>Training a neural network involves finding the optimal weights and biases. This is typically done using an optimization algorithm like <strong>Gradient Descent</strong> and the <strong>Backpropagation</strong> algorithm.</p>
+                <ol>
+                    <li><strong>Forward Pass:</strong> Input data is passed through the network to generate a prediction.</li>
+                    <li><strong>Loss Calculation:</strong> A loss function (e.g., Mean Squared Error for regression) measures the error between the prediction and the true value.</li>
+                    <li><strong>Backward Pass (Backpropagation):</strong> The error is propagated backward through the network, and the gradient of the loss with respect to each weight is calculated.</li>
+                    <li><strong>Weight Update:</strong> The weights are updated in the direction that minimizes the loss, scaled by a <strong>learning rate</strong>.</li>
+                </ol>
+                
+                <h4>Optimization Algorithms</h4>
+                <div class="card-container">
+                    <div class="card">
+                        <h5>Stochastic Gradient Descent (SGD)</h5>
+                        <p>Basic optimization algorithm. Updates weights using a subset of data.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Adam</h5>
+                        <p>Adaptive Moment Estimation. Combines benefits of two other extensions of SGD.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>RMSprop</h5>
+                        <p>Root Mean Square Propagation. Maintains a moving average of squared gradients.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Adagrad</h5>
+                        <p>Adaptive Gradient Algorithm. Adapts learning rate to parameters.</p>
+                    </div>
+                </div>
+                
+                <h4>Common Loss Functions</h4>
+                <div class="card-container">
+                    <div class="card">
+                        <h5>Mean Squared Error (MSE)</h5>
+                        <p>$$MSE = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2$$</p>
+                        <p>Used for regression tasks.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Cross-Entropy Loss</h5>
+                        <p>$$L = -\frac{1}{n}\sum_{i=1}^{n}\sum_{j=1}^{m}y_{ij}\log(\hat{y}_{ij})$$</p>
+                        <p>Used for classification tasks.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Binary Cross-Entropy</h5>
+                        <p>$$L = -\frac{1}{n}\sum_{i=1}^{n}[y_i\log(\hat{y}_i) + (1-y_i)\log(1-\hat{y}_i)]$$</p>
+                        <p>Used for binary classification.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="cnn" class="fade-in-section">
+                <h2>4. Convolutional Neural Networks (CNNs)</h2>
+                <p>CNNs are the gold standard for computer vision tasks. They are designed to automatically and adaptively learn spatial hierarchies of features from images.</p>
+                
+                <h4>Key Layers</h4>
+                <ul>
+                    <li><strong>Convolutional Layer:</strong> Uses filters (kernels) to slide over the input image and produce feature maps. Each filter learns to detect a specific feature like an edge, corner, or texture.</li>
+                    <li><strong>Pooling Layer:</strong> Downsamples the feature maps, reducing computational complexity and making the detected features more robust to changes in position (translation invariance).</li>
+                    <li><strong>Fully Connected Layer:</strong> A traditional MLP layer, usually at the end of the network, that performs classification based on the learned features.</li>
+                </ul>
+
+                <h4>Animated Convolution</h4>
+                <div class="diagram-container">
+                    <svg id="conv-diagram" viewBox="0 0 200 200">
+                        <!-- Input Grid -->
+                        <g id="input-grid">
+                            <defs>
+                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#444" stroke-width="1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100" height="100" x="50" y="50" fill="url(#grid)" stroke="#888" />
+                            <text x="100" y="40" text-anchor="middle" fill="var(--text-secondary)">Input Image</text>
+                        </g>
+                        <!-- Kernel -->
+                        <rect id="conv-kernel" x="50" y="50" width="40" height="40" fill="rgba(3, 218, 198, 0.4)" stroke="var(--accent-primary)" stroke-width="2"/>
+                    </svg>
+                     <button id="animate-conv-btn">Animate Convolution</button>
+                </div>
+                
+                <h4>Popular CNN Architectures</h4>
+                <div class="card-container">
+                    <div class="card">
+                        <h5>LeNet-5</h5>
+                        <p>One of the earliest CNNs, used for digit recognition.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>AlexNet</h5>
+                        <p>Won ImageNet 2012, popularized deep CNNs for computer vision.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>VGGNet</h5>
+                        <p>Demonstrated that depth is a critical component for good performance.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>ResNet</h5>
+                        <p>Introduced residual connections to enable training of very deep networks.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Inception</h5>
+                        <p>Uses multiple filter sizes in the same layer, processed in parallel.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="rnn" class="fade-in-section">
+                <h2>5. Recurrent Neural Networks (RNNs)</h2>
+                <p>RNNs are designed to work with sequential data, such as text or time series. They maintain an internal state (or "memory") that captures information about what has been processed so far.</p>
+                
+                <div class="math-formula">
+                    $$h_t = f(W_{hh}h_{t-1} + W_{xh}x_t + b_h)$$
+                    $$y_t = W_{hy}h_t + b_y$$
+                </div>
+                
+                <h4>The Challenge of Long-Term Dependencies</h4>
+                <p>Simple RNNs struggle to remember information over long sequences, a problem known as the <strong>vanishing gradient problem</strong>. To solve this, more advanced architectures were developed.</p>
+                <ul>
+                    <li><strong>LSTM (Long Short-Term Memory):</strong> An advanced RNN with a complex cell structure involving three "gates" (forget, input, output) that regulate the flow of information. This allows LSTMs to effectively learn long-term dependencies.</li>
+                    <li><strong>GRU (Gated Recurrent Unit):</strong> A simplified version of the LSTM with only two gates (update and reset). GRUs are often as effective as LSTMs but are computationally more efficient.</li>
+                </ul>
+                
+                <h4>Applications of RNNs</h4>
+                <div class="card-container">
+                    <div class="card">
+                        <h5>Natural Language Processing</h5>
+                        <p>Language modeling, machine translation, text generation.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Time Series Prediction</h5>
+                        <p>Stock market forecasting, weather prediction.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Speech Recognition</h5>
+                        <p>Converting spoken language to text.</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h5>Music Generation</h5>
+                        <p>Creating new musical sequences.</p>
+                    </div>
+                </div>
+            </section>
+
+             <section id="generative-models" class="fade-in-section">
+                <h2>6. Generative Models</h2>
+                <p>Generative models learn the underlying distribution of data and can create new, synthetic data samples. They are a cornerstone of creative AI.</p>
+                
+                <h3 id="gans">6.1. Generative Adversarial Networks (GANs)</h3>
+                <p>GANs use a clever adversarial process between two neural networks:</p>
+                <ul>
+                    <li>The <strong>Generator</strong> tries to create realistic data (e.g., images of faces) from random noise.</li>
+                    <li>The <strong>Discriminator</strong> tries to determine whether a given image is real (from the training set) or fake (from the generator).</li>
+                </ul>
+                <p>They are trained together in a zero-sum game. The generator gets better at creating convincing fakes, and the discriminator gets better at spotting them. This dynamic pushes the generator to produce incredibly realistic outputs.</p>
+                
+                <div class="math-formula">
+                    $$\min_G \max_D V(D, G) = \mathbb{E}_{x \sim p_{data}(x)}[\log D(x)] + \mathbb{E}_{z \sim p_z(z)}[\log(1 - D(G(z)))]$$
+                </div>
+
+                <h3 id="autoencoders">6.2. Autoencoders</h3>
+                <p>An autoencoder is a type of neural network used for unsupervised learning, typically for dimensionality reduction and feature learning. It consists of two parts:</p>
+                <ul>
+                    <li>An <strong>Encoder</strong> that compresses the input data into a low-dimensional representation called the latent space.</li>
+                    <li>A <strong>Decoder</strong> that reconstructs the original data from this compressed representation.</li>
+                </ul>
+                <p>By forcing data through this "bottleneck," the network learns the most important features. <strong>Variational Autoencoders (VAEs)</strong> are a generative extension that can create new data by sampling from the learned latent space.</p>
+                
+                <h3 id="diffusion-models">6.3. Diffusion Models</h3>
+                <p>Diffusion models are a class of generative models that work by gradually adding noise to data and then learning to reverse this process. They have recently shown state-of-the-art performance in image generation.</p>
+            </section>
+            
+            <section id="transformers" class="fade-in-section">
+                <h2>7. Transformers and Attention Mechanisms</h2>
+                <p>The Transformer architecture, introduced in the paper "Attention Is All You Need," has revolutionized natural language processing and is increasingly being applied to other domains.</p>
+                
+                <h3 id="attention">7.1. Attention Mechanism</h3>
+                <p>The attention mechanism allows models to focus on different parts of the input when producing each part of the output. The key innovation is the self-attention mechanism, which allows each position in the sequence to attend to all other positions.</p>
+                
+                <div class="math-formula">
+                    $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+                </div>
+                
+                <h3 id="transformer-arch">7.2. Transformer Architecture</h3>
+                <p>The Transformer consists of an encoder and decoder, each composed of multiple layers. Key components include:</p>
+                <ul>
+                    <li><strong>Multi-Head Attention:</strong> Multiple attention mechanisms run in parallel.</li>
+                    <li><strong>Positional Encoding:</strong> Injects information about the position of tokens in the sequence.</li>
+                    <li><strong>Feed-Forward Networks:</strong> Applied to each position separately and identically.</li>
+                    <li><strong>Residual Connections and Layer Normalization:</strong> Help with training deep networks.</li>
+                </ul>
+                
+                <h3 id="bert-gpt">7.3. BERT and GPT</h3>
+                <p>Two influential Transformer-based models:</p>
+                <ul>
+                    <li><strong>BERT (Bidirectional Encoder Representations from Transformers):</strong> Uses the encoder part of the Transformer and is pre-trained using masked language modeling.</li>
+                    <li><strong>GPT (Generative Pre-trained Transformer):</strong> Uses the decoder part of the Transformer and is pre-trained using causal language modeling.</li>
+                </ul>
+            </section>
+
+            <section id="advanced-topics" class="fade-in-section">
+                <h2>8. Advanced Topics</h2>
+                
+                <h3 id="transfer-learning">8.1. Transfer Learning</h3>
+                <p>Transfer learning involves taking a model trained on one task and adapting it for a different but related task. This is particularly useful when you have limited data for your specific problem.</p>
+                
+                <h3 id="federated-learning">8.2. Federated Learning</h3>
+                <p>Federated learning is a distributed machine learning approach that allows model training on decentralized data residing on multiple devices (like mobile phones) without exchanging the data itself.</p>
+                
+                <h3 id="explainable-ai">8.3. Explainable AI (XAI)</h3>
+                <p>As AI systems become more complex, understanding their decisions becomes crucial. XAI techniques help interpret and explain the predictions of machine learning models.</p>
+                
+                <h3 id="ethical-ai">8.4. Ethical AI</h3>
+                <p>Ethical considerations in AI include addressing bias in algorithms, ensuring fairness, maintaining privacy, and considering the societal impact of AI systems.</p>
+            </section>
+
+            <section id="code-examples" class="fade-in-section">
+                <h2>9. Practical Code Examples</h2>
+                <p>Here are some simple examples using popular Python libraries like Scikit-learn and TensorFlow/Keras.</p>
+                
+                <h4>Linear Regression with Scikit-learn</h4>
+                <div class="code-block-wrapper">
+                    <pre><code class="language-python">
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Assume X (features) and y (target) are pre-loaded
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"Mean Squared Error: {mse:.2f}")
+print(f"R-squared: {r2:.2f}")
+                    </code></pre>
+                    <button class="copy-btn">Copy</button>
+                </div>
+
+                <h4>Simple CNN for Image Classification with Keras</h4>
+                 <div class="code-block-wrapper">
+                    <pre><code class="language-python">
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.utils import to_categorical
+
+# Load and preprocess data (example with MNIST)
+(X_train, y_train), (X_test, y_test) = tf.keras.datasets.mnist.load_data()
+
+# Normalize pixel values
+X_train = X_train.reshape(-1, 28, 28, 1).astype('float32') / 255.0
+X_test = X_test.reshape(-1, 28, 28, 1).astype('float32') / 255.0
+
+# Convert labels to categorical one-hot encoding
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
+
+# Build model
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Train model
+history = model.fit(X_train, y_train, 
+                    epochs=10, 
+                    batch_size=32, 
+                    validation_split=0.1)
+
+# Evaluate model
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print(f"Test accuracy: {test_acc:.4f}")
+                    </code></pre>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                
+                <h4>Simple Transformer Implementation with TensorFlow</h4>
+                <div class="code-block-wrapper">
+                    <pre><code class="language-python">
+import tensorflow as tf
+from tensorflow.keras.layers import Dense, LayerNormalization, Dropout
+from tensorflow.keras.models import Model
+
+def scaled_dot_product_attention(q, k, v, mask=None):
+    # Calculate attention scores
+    matmul_qk = tf.matmul(q, k, transpose_b=True)
+    
+    # Scale matmul_qk
+    dk = tf.cast(tf.shape(k)[-1], tf.float32)
+    scaled_attention_logits = matmul_qk / tf.math.sqrt(dk)
+    
+    # Add mask if provided
+    if mask is not None:
+        scaled_attention_logits += (mask * -1e9)
+    
+    # Softmax to get attention weights
+    attention_weights = tf.nn.softmax(scaled_attention_logits, axis=-1)
+    
+    # Multiply by values
+    output = tf.matmul(attention_weights, v)
+    
+    return output, attention_weights
+
+class MultiHeadAttention(tf.keras.layers.Layer):
+    def __init__(self, d_model, num_heads):
+        super(MultiHeadAttention, self).__init__()
+        self.num_heads = num_heads
+        self.d_model = d_model
+        
+        assert d_model % self.num_heads == 0
+        
+        self.depth = d_model // self.num_heads
+        
+        self.wq = Dense(d_model)
+        self.wk = Dense(d_model)
+        self.wv = Dense(d_model)
+        
+        self.dense = Dense(d_model)
+        
+    def split_heads(self, x, batch_size):
+        x = tf.reshape(x, (batch_size, -1, self.num_heads, self.depth))
+        return tf.transpose(x, perm=[0, 2, 1, 3])
+    
+    def call(self, v, k, q, mask=None):
+        batch_size = tf.shape(q)[0]
+        
+        q = self.wq(q)
+        k = self.wk(k)
+        v = self.wv(v)
+        
+        q = self.split_heads(q, batch_size)
+        k = self.split_heads(k, batch_size)
+        v = self.split_heads(v, batch_size)
+        
+        scaled_attention, attention_weights = scaled_dot_product_attention(
+            q, k, v, mask)
+        
+        scaled_attention = tf.transpose(scaled_attention, perm=[0, 2, 1, 3])
+        concat_attention = tf.reshape(scaled_attention, 
+                                      (batch_size, -1, self.d_model))
+        
+        output = self.dense(concat_attention)
+        
+        return output, attention_weights
+                    </code></pre>
+                    <button class="copy-btn">Copy</button>
+                </div>
+            </section>
+            
+            <section id="resources" class="fade-in-section">
+                <h2>10. Learning Resources</h2>
+                
+                <h3>Online Courses</h3>
+                <ul>
+                    <li><a href="https://www.coursera.org/learn/machine-learning" target="_blank">Machine Learning by Andrew Ng (Coursera)</a></li>
+                    <li><a href="https://www.deeplearning.ai/" target="_blank">Deep Learning Specialization by deeplearning.ai</a></li>
+                    <li><a href="https://www.fast.ai/" target="_blank">Practical Deep Learning for Coders by fast.ai</a></li>
+                </ul>
+                
+                <h3>Books</h3>
+                <ul>
+                    <li><em>Pattern Recognition and Machine Learning</em> by Christopher Bishop</li>
+                    <li><em>Deep Learning</em> by Ian Goodfellow, Yoshua Bengio, and Aaron Courville</li>
+                    <li><em>Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</em> by Aurélien Géron</li>
+                </ul>
+                
+                <h3>Research Papers</h3>
+                <ul>
+                    <li><a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention Is All You Need (Transformer)</a></li>
+                    <li><a href="https://arxiv.org/abs/1409.3215" target="_blank">Sequence to Sequence Learning with Neural Networks</a></li>
+                    <li><a href="https://arxiv.org/abs/1406.2661" target="_blank">Generative Adversarial Networks (GANs)</a></li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+
+    <button id="scrollTopBtn" title="Go to top">▲</button>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tocContainer = document.getElementById('table-of-contents');
+        const sections = document.querySelectorAll('.main-content section');
+        const animatedElements = document.querySelectorAll('.fade-in-section');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+        // --- Generate Table of Contents ---
+        let tocHTML = '<ul>';
+        sections.forEach(section => {
+            const title = section.querySelector('h2').textContent;
+            const id = section.id;
+            tocHTML += `<li><a href="#${id}" class="toc-link">${title}</a></li>`;
+        });
+        tocHTML += '</ul>';
+        tocContainer.innerHTML = tocHTML;
+        const tocLinks = document.querySelectorAll('.toc-link');
+
+        // --- Intersection Observer for fade-in animations ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        animatedElements.forEach(el => observer.observe(el));
+        
+        // --- Animate ML Pipeline Diagram ---
+        const pipelineObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                const steps = document.querySelectorAll('.pipeline-step');
+                const arrows = document.querySelectorAll('.pipeline-arrow');
+                steps.forEach((step, i) => {
+                    setTimeout(() => step.classList.add('visible'), i * 300);
+                });
+                arrows.forEach((arrow, i) => {
+                     setTimeout(() => arrow.classList.add('visible'), 150 + i * 300);
+                });
+                pipelineObserver.unobserve(entries.target);
+            }
+        }, { threshold: 0.5 });
+        pipelineObserver.observe(document.querySelector('.pipeline-step').parentElement);
+
+        // --- AI History Chart ---
+        const historyCtx = document.getElementById('ai-history-chart');
+        if (historyCtx) {
+            new Chart(historyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1950s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'],
+                    datasets: [{
+                        label: 'AI Research Interest',
+                        data: [20, 80, 30, 70, 40, 60, 95, 100],
+                        borderColor: '#03dac6',
+                        tension: 0.3,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'AI Research Interest Over Time (Approximate)',
+                            color: '#e0e0e0'
+                        },
+                        legend: {
+                            labels: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: '#b3b3b3'
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#b3b3b3'
+                            },
+                            grid: {
+                                color: '#333333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Scroll to Top Button ---
+        const handleScroll = () => {
+            if (window.scrollY > 300) {
+                scrollTopBtn.style.display = "block";
+            } else {
+                scrollTopBtn.style.display = "none";
+            }
+        };
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- Active Link Highlighting in Sidebar ---
+        const updateActiveLink = () => {
+            let currentSection = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', () => {
+            handleScroll();
+            updateActiveLink();
+        });
+        
+        // --- Copy button for code blocks ---
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const pre = button.previousElementSibling;
+                const code = pre.querySelector('code').innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    button.innerText = 'Copied!';
+                    setTimeout(() => { button.innerText = 'Copy'; }, 2000);
+                });
+            });
+        });
+
+        // --- NN Diagram Animation ---
+        const animateNNBtn = document.getElementById('animate-nn-btn');
+        if (animateNNBtn) {
+            const nnDiagram = document.getElementById('nn-diagram');
+            const links1Container = document.getElementById('links1');
+            const links2Container = document.getElementById('links2');
+            const inputNodes = Array.from(document.querySelectorAll('#input-layer .nn-node'));
+            const hiddenNodes = Array.from(document.querySelectorAll('#hidden-layer .nn-node'));
+            const outputNodes = Array.from(document.querySelectorAll('#output-layer .nn-node'));
+
+            // Create links
+            let links1HTML = '';
+            inputNodes.forEach(iNode => {
+                hiddenNodes.forEach(hNode => {
+                    links1HTML += `<line class="nn-link" x1="${iNode.cx.baseVal.value}" y1="${iNode.cy.baseVal.value}" x2="${hNode.cx.baseVal.value}" y2="${hNode.cy.baseVal.value}" stroke="#555" stroke-width="1"/>`;
+                });
+            });
+            links1Container.innerHTML = links1HTML;
+            
+            let links2HTML = '';
+             hiddenNodes.forEach(hNode => {
+                outputNodes.forEach(oNode => {
+                    links2HTML += `<line class="nn-link" x1="${hNode.cx.baseVal.value}" y1="${hNode.cy.baseVal.value}" x2="${oNode.cx.baseVal.value}" y2="${oNode.cy.baseVal.value}" stroke="#555" stroke-width="1"/>`;
+                });
+            });
+            links2Container.innerHTML = links2HTML;
+            
+            const links1 = Array.from(links1Container.children);
+            const links2 = Array.from(links2Container.children);
+
+            animateNNBtn.addEventListener('click', () => {
+                const allElements = [...inputNodes, ...links1, ...hiddenNodes, ...links2, ...outputNodes];
+                allElements.forEach(el => el.classList.remove('active'));
+                
+                // Animate flow
+                setTimeout(() => inputNodes.forEach(n => n.classList.add('active')), 0);
+                setTimeout(() => links1.forEach(l => { l.classList.add('active'); l.style.stroke = 'var(--accent-secondary)'; }), 500);
+                setTimeout(() => hiddenNodes.forEach(n => n.classList.add('active')), 1500);
+                setTimeout(() => links2.forEach(l => { l.classList.add('active'); l.style.stroke = '#ff7043'; }), 2000);
+                setTimeout(() => outputNodes.forEach(n => n.classList.add('active')), 3000);
+            });
+        }
+        
+        // --- Convolution Animation ---
+        const animateConvBtn = document.getElementById('animate-conv-btn');
+        if (animateConvBtn) {
+            const kernel = document.getElementById('conv-kernel');
+            let animState = 0;
+            const positions = [
+                {x: 50, y: 50}, {x: 70, y: 50}, {x: 90, y: 50}, {x: 110, y: 50},
+                {x: 50, y: 70}, {x: 70, y: 70}, {x: 90, y: 70}, {x: 110, y: 70},
+                {x: 50, y: 90}, {x: 70, y: 90}, {x: 90, y: 90}, {x: 110, y: 90},
+                {x: 50, y: 110}, {x: 70, y: 110}, {x: 90, y: 110}, {x: 110, y: 110},
+            ];
+
+            animateConvBtn.addEventListener('click', () => {
+                let i = 0;
+                kernel.style.transition = 'none'; // Reset for instant positioning
+                kernel.setAttribute('x', 50);
+                kernel.setAttribute('y', 50);
+                
+                setTimeout(() => {
+                    kernel.style.transition = 'all 0.5s ease-in-out';
+                    function moveKernel() {
+                        if (i < positions.length) {
+                            const pos = positions[i];
+                            kernel.setAttribute('x', pos.x);
+                            kernel.setAttribute('y', pos.y);
+                            i++;
+                            setTimeout(moveKernel, 300);
+                        }
+                    }
+                    moveKernel();
+                }, 100);
+            });
+        }
+
+        // Initial state checks
+        handleScroll();
+        updateActiveLink();
+        
+        // Render MathJax formulas
+        if (typeof MathJax !== 'undefined') {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+        }
+    });
+    </script>
+</body>
+</html>
